@@ -3,11 +3,15 @@ package com.alura.vollmed.domain.medico;
 import com.alura.vollmed.domain.endereco.Endereco;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Entity
 @Table(name = "medicos")
+@Entity(name = "Medico")
 @Getter
+@NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class Medico {
 
     @Id
@@ -26,8 +30,6 @@ public class Medico {
     private Endereco endereco;
 
     private boolean ativo;
-
-    public Medico(){}
 
     public Medico(DadosCadastroMedico dados) {
         this.ativo = true;

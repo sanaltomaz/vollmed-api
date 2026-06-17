@@ -2,11 +2,15 @@ package com.alura.vollmed.domain.paciente;
 
 import com.alura.vollmed.domain.endereco.Endereco;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Entity
 @Table(name = "pacientes")
+@Entity(name = "Paciente")
 @Getter
+@NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class Paciente {
 
     @Id
@@ -22,9 +26,6 @@ public class Paciente {
     private Endereco endereco;
 
     private boolean ativo;
-
-    public Paciente() {
-    }
 
     public Paciente(DadosCadastroPaciente dados) {
         this.ativo = true;
