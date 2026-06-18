@@ -1,4 +1,4 @@
-package com.alura.vollmed.infra;
+package com.alura.vollmed.infra.exception;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
