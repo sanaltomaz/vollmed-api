@@ -27,7 +27,7 @@ public class PacienteController {
             UriComponentsBuilder uriBuilder) {
 
         var paciente = new Paciente(dados);
-        repository.save(new Paciente(dados));
+        repository.save(paciente);
 
         var uri = uriBuilder.path("/pacientes/{id}")
                 .buildAndExpand(paciente.getId()).toUri();
