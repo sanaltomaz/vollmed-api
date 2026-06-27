@@ -31,7 +31,7 @@ public class AgendamentoService {
             throw new ValidacaoConsultaException("Sem médico disponível no momento.");
         }
 
-        var consulta = new Consulta(null, medico.getId(), paciente.getId(), dados.data());
+        var consulta = new Consulta(null, medico.getId(), paciente.getId(), dados.data(), true, null, "");
 
         consultaRepository.save(consulta);
     }

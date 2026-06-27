@@ -28,10 +28,23 @@ public class Consulta {
 
     private LocalDateTime data;
 
+    private boolean status = true;
+
+    @Column(name = "motivo_cancelamento")
+    @Enumerated(EnumType.STRING)
+    private MotivoCancelamento motivoCancelamento;
+    private String comentario;
+
+
     public Consulta(DadosAgendamentoConsulta dados) {
         this.idMedico = dados.idMedico();
         this.idPaciente = dados.idPaciente();
         this.data = dados.data();
     }
 
+    public void cancelar(DadosCancelamentoConsulta dados) {
+        this.status = false;
+        this.motivoCancelamento = dados.motivo();
+        this.comentario = dados.comentario();
+    }
 }

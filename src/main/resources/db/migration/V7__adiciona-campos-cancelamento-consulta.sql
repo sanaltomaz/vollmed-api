@@ -1,0 +1,6 @@
+ALTER TABLE consultas
+ADD COLUMN status BOOLEAN NOT NULL DEFAULT TRUE;
+
+ALTER TABLE consultas
+ADD COLUMN motivo_cancelamento VARCHAR(100),
+ADD COLUMN comentario TEXT;
