@@ -28,4 +28,10 @@ public class Consulta {
 
     private LocalDateTime data;
 
+    public Consulta(DadosAgendamentoConsulta dados) {
+        this.idMedico = dados.idMedico();
+        this.idPaciente = dados.idPaciente();
+        this.data = dados.data();
+    }
+
 }

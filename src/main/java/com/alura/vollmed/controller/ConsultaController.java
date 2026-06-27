@@ -1,9 +1,6 @@
 package com.alura.vollmed.controller;
 
-import com.alura.vollmed.domain.consulta.AgendamentoService;
-import com.alura.vollmed.domain.consulta.ConsultaRepository;
-import com.alura.vollmed.domain.consulta.DadosAgendamentoConsulta;
-import com.alura.vollmed.domain.consulta.DadosListagemConsultas;
+import com.alura.vollmed.domain.consulta.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/consultas")
@@ -25,9 +23,18 @@ public class ConsultaController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity agendarConsulta(@RequestBody @Valid DadosAgendamentoConsulta dados) {
+    public ResponseEntity agendarConsulta(
+            @RequestBody @Valid DadosAgendamentoConsulta dados,
+            UriComponentsBuilder uriBuilder) {
+
+        var consulta = new Consulta(dados);
         agendamentoService.agendar(dados);
-        return ResponseEntity.ok().build();
+
+        var uri = uriBuilder.path("/consultas/{id}")
+                .buildAndExpand(consulta.getId()).toUri();
+
+        return ResponseEntity.created(uri)
+                .body(new DadosDetalhesConsulta(consulta));
     }
 
     @GetMapping
