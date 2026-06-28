@@ -35,6 +35,11 @@ public class Consulta {
     private MotivoCancelamento motivoCancelamento;
     private String comentario;
 
+    public Consulta(Long idMedico, Long idPaciente, LocalDateTime data){
+        this.idMedico = idMedico;
+        this.idPaciente = idPaciente;
+        this.data = data;
+    }
 
     public Consulta(DadosAgendamentoConsulta dados) {
         this.idMedico = dados.idMedico();

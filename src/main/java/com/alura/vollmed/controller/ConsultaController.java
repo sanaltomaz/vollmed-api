@@ -23,18 +23,17 @@ public class ConsultaController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity agendarConsulta(
+    public ResponseEntity<DadosDetalhesConsulta> agendarConsulta(
             @RequestBody @Valid DadosAgendamentoConsulta dados,
             UriComponentsBuilder uriBuilder) {
 
-        var consulta = new Consulta(dados);
-        agendamentoService.agendar(dados);
+        var resposta = agendamentoService.agendar(dados);
 
         var uri = uriBuilder.path("/consultas/{id}")
-                .buildAndExpand(consulta.getId()).toUri();
+                .buildAndExpand(resposta.id()).toUri();
 
         return ResponseEntity.created(uri)
-                .body(new DadosDetalhesConsulta(consulta));
+                .body(resposta);
     }
 
     @GetMapping

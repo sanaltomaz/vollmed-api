@@ -19,10 +19,7 @@ public class AgendamentoService {
     @Autowired
     private MedicoRepository medicoRepository;
 
-    public void agendar(@Valid DadosAgendamentoConsulta dados) {
-        if (!pacienteRepository.existsById(dados.idPaciente())) {
-            throw new ValidacaoConsultaException("Id do paciente informado não existe!");
-        }
+    public DadosDetalhesConsulta agendar(@Valid DadosAgendamentoConsulta dados) {
 
         var paciente = pacienteRepository.getReferenceById(dados.idPaciente());
         var medico = escolherMedico(dados);
@@ -31,9 +28,18 @@ public class AgendamentoService {
             throw new ValidacaoConsultaException("Sem médico disponível no momento.");
         }
 
-        var consulta = new Consulta(null, medico.getId(), paciente.getId(), dados.data(), true, null, "");
+        var consulta = new Consulta(
+                medico.getId(),
+                paciente.getId(),
+                dados.data()
+        );
 
         consultaRepository.save(consulta);
+
+        var nomeMedico = medico.getNome();
+        var nomePaciente = paciente.getNome();
+
+        return new DadosDetalhesConsulta(consulta, nomeMedico, nomePaciente);
     }
 
     private Medico escolherMedico(@Valid DadosAgendamentoConsulta dados) {
