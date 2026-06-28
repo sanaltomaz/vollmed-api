@@ -1,5 +1,7 @@
 package com.alura.vollmed.domain.consulta;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDateTime;
 
 public record DadosDetalhesConsulta(
@@ -8,6 +10,8 @@ public record DadosDetalhesConsulta(
         String nomeMedico,
         Long idPaciente,
         String nomePaciente,
+
+        @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
         LocalDateTime data
 ) {
 
