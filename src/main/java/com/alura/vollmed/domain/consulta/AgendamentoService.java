@@ -1,11 +1,14 @@
 package com.alura.vollmed.domain.consulta;
 
+import com.alura.vollmed.domain.consulta.validador.ValidadorAgendamento;
 import com.alura.vollmed.domain.medico.Medico;
 import com.alura.vollmed.domain.medico.MedicoRepository;
 import com.alura.vollmed.domain.paciente.PacienteRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class AgendamentoService {
@@ -19,10 +22,15 @@ public class AgendamentoService {
     @Autowired
     private MedicoRepository medicoRepository;
 
+    @Autowired
+    private List<ValidadorAgendamento> validadores;
+
     public DadosDetalhesConsulta agendar(@Valid DadosAgendamentoConsulta dados) {
 
         var paciente = pacienteRepository.getReferenceById(dados.idPaciente());
         var medico = escolherMedico(dados);
+
+        validadores.forEach(v -> v.validar(dados));
 
         if (medico == null) {
             throw new ValidacaoConsultaException("Sem médico disponível no momento.");
@@ -45,9 +53,6 @@ public class AgendamentoService {
     private Medico escolherMedico(@Valid DadosAgendamentoConsulta dados) {
         if (dados.idMedico() != null) {
             return medicoRepository.getReferenceById(dados.idMedico());
-        }
-        if (dados.especialidade() == null) {
-            throw new ValidacaoConsultaException("Especialidade é obrigatória quando médico não for escolhido!");
         }
 
         return medicoRepository.escolherMedicoAleatorioLivreNaData(dados.especialidade(), dados.data());
