@@ -47,9 +47,9 @@ public class Consulta {
         this.data = dados.data();
     }
 
-    public void cancelar(DadosCancelamentoConsulta dados) {
+    public void cancelar(MotivoCancelamento motivo, String comentario) {
         this.status = false;
-        this.motivoCancelamento = dados.motivo();
-        this.comentario = dados.comentario();
+        this.motivoCancelamento = motivo;
+        this.comentario = comentario;
     }
 }

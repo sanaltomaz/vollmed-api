@@ -19,6 +19,9 @@ public class ConsultaController {
     private AgendamentoService agendamentoService;
 
     @Autowired
+    private CancelamentoService cancelamentoService;
+
+    @Autowired
     private ConsultaRepository repository;
 
     @PostMapping
@@ -52,8 +55,8 @@ public class ConsultaController {
     public ResponseEntity cancelarConsulta(
             @RequestBody @Valid DadosCancelamentoConsulta dados,
             @PathVariable Long id) {
-        var consulta = repository.getReferenceById(id);
-        consulta.cancelar(dados);
+
+        cancelamentoService.cancelar(dados, id);
 
         return ResponseEntity.noContent().build();
     }
