@@ -1,7 +1,6 @@
 package com.alura.vollmed.infra.exception;
 
 import com.alura.vollmed.domain.consulta.ValidacaoConsultaException;
-import com.alura.vollmed.domain.consulta.validador.ValidadorAgendamento;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

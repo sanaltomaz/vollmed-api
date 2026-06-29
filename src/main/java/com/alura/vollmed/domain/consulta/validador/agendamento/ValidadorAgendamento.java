@@ -1,4 +1,4 @@
-package com.alura.vollmed.domain.consulta.validador;
+package com.alura.vollmed.domain.consulta.validador.agendamento;
 
 import com.alura.vollmed.domain.consulta.DadosAgendamentoConsulta;
 
