@@ -1,10 +1,8 @@
 package com.alura.vollmed.domain.consulta;
 
-import com.alura.vollmed.domain.endereco.DadosEndereco;
-import com.alura.vollmed.domain.medico.DadosCadastroMedico;
+import com.alura.vollmed.domain.endereco.Endereco;
 import com.alura.vollmed.domain.medico.Especialidade;
 import com.alura.vollmed.domain.medico.Medico;
-import com.alura.vollmed.domain.paciente.DadosCadastroPaciente;
 import com.alura.vollmed.domain.paciente.Paciente;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,24 +44,16 @@ class ConsultaRepositoryTest {
         inicioDoDia = dataConsulta.toLocalDate().atStartOfDay();
         fimDoDia = dataConsulta.toLocalDate().atTime(LocalTime.MAX);
 
-        paciente = cadastrarPaciente(
-                "paciente",
-                "paciente@gmail.com",
-                "12079127010"
-        );
-
-        medico = cadastrarMedico(
-                "medico",
-                "medico@vollmed.com",
-                "201897",
-                Especialidade.CARDIOLOGIA
-        );
+        paciente = cadastrarPaciente(pacientePadrao());
+        medico = cadastrarMedico(medicoPadrao());
     }
 
     @Test
     @DisplayName("Deve retornar True se Existir Paciente possui consulta no dia")
     void deveRetornarTrueQuandoExistirNoIntervalo() {
+
         cadastrarConsulta(medico, paciente, dataConsulta);
+
         var pacientePossuiConsulta = buscarConsultaDePaciente(paciente.getId());
 
         assertThat(pacientePossuiConsulta).isEqualTo(Boolean.TRUE);
@@ -72,6 +62,7 @@ class ConsultaRepositoryTest {
     @Test
     @DisplayName("Deve retornar FALSE quando NÃO existir consulta do paciente na data")
     void deveRetornarFalseQuandoNaoExistirNoIntervalo() {
+
         var pacientePossuiConsulta = buscarConsultaDePaciente(paciente.getId());
 
         assertThat(pacientePossuiConsulta).isEqualTo(Boolean.FALSE);
@@ -80,11 +71,8 @@ class ConsultaRepositoryTest {
     @Test
     @DisplayName("Deve retornar FALSE quando a consulta pertencer a outro paciente")
     void deveRetornarFalseQuandoExistirConsultaDeOutroPaciente() {
-        var outroPaciente = cadastrarPaciente(
-                "outro paciente",
-                "outro.paciente@gmail.com",
-                "15786590130"
-        );
+
+        var outroPaciente = cadastrarPaciente(pacientePadrao("Outro Paciente"));
 
         cadastrarConsulta(medico, outroPaciente, dataConsulta);
         var pacientePossuiConsulta = buscarConsultaDePaciente(paciente.getId());
@@ -130,15 +118,13 @@ class ConsultaRepositoryTest {
                 .withMinute(0);
     }
 
-    private Paciente cadastrarPaciente(String nome, String email, String cpf) {
-        var paciente = new Paciente(dadosPaciente(nome, email, cpf));
+    private Paciente cadastrarPaciente(Paciente paciente) {
         em.persist(paciente);
         em.flush();
         return paciente;
     }
 
-    private Medico cadastrarMedico(String nome, String email, String crm, Especialidade especialidade) {
-        var medico = new Medico(dadosMedico(nome, email, crm, especialidade));
+    private Medico cadastrarMedico(Medico medico) {
         em.persist(medico);
         em.flush();
         return medico;
@@ -149,34 +135,44 @@ class ConsultaRepositoryTest {
         em.flush();
     }
 
-    private DadosCadastroPaciente dadosPaciente(String nome, String email, String cpf) {
-        return new DadosCadastroPaciente(
-                nome,
-                email,
-                "61999999999",
-                cpf,
-                dadosEndereco()
+    private Paciente pacientePadrao() {
+        return new Paciente(
+                "Paciente",
+                "paciente@gmail.com",
+                "17912345678",
+                "00100200312",
+                enderecoPadrao()
         );
     }
 
-    private DadosCadastroMedico dadosMedico(String nome, String email, String crm, Especialidade especialidade) {
-        return new DadosCadastroMedico(
+    private Paciente pacientePadrao(String nome) {
+        return new Paciente(
                 nome,
-                email,
-                "61999999999",
-                crm,
-                especialidade,
-                dadosEndereco()
+                "outropaciente@gmail.com",
+                "17912345678",
+                "10020230012",
+                enderecoPadrao()
         );
     }
 
-    private DadosEndereco dadosEndereco() {
-        return new DadosEndereco(
-                "rua xpto",
-                "bairro",
-                "00000000",
-                "Brasilia",
-                "DF",
+    private Medico medicoPadrao() {
+        return new Medico(
+                "Medico",
+                "medico@vollmed.com",
+                "17912345678",
+                "001002",
+                Especialidade.CARDIOLOGIA,
+                enderecoPadrao()
+        );
+    }
+
+    private Endereco enderecoPadrao() {
+        return new Endereco(
+                "Rua XPTO",
+                "100",
+                "Casa",
+                "Centro",
+                "Brasília",
                 "DF",
                 "79874015"
         );

@@ -1,8 +1,7 @@
 package com.alura.vollmed.domain.medico;
 
 import com.alura.vollmed.domain.consulta.Consulta;
-import com.alura.vollmed.domain.endereco.DadosEndereco;
-import com.alura.vollmed.domain.paciente.DadosCadastroPaciente;
+import com.alura.vollmed.domain.endereco.Endereco;
 import com.alura.vollmed.domain.paciente.Paciente;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,22 +31,22 @@ class MedicoRepositoryTest {
     private TestEntityManager em;
 
     private Paciente paciente;
+    private Medico medico;
     private LocalDateTime dataConsulta;
 
     @BeforeEach
     void setup() {
-        paciente = cadastrarPaciente(
-                "paciente",
-                "paciente@gmail.com",
-                "57652579073"
-        );
-
         dataConsulta = proximaSegundaAs10Horas();
+
+        medico = cadastrarMedico();
+        paciente = cadastrarPaciente();
     }
 
     @Test
     @DisplayName("Devolver Null quando não houver médicos disponiveis")
     void deveRetornarNullQuandoNaoExistirMedicoDisponivel() {
+        cadastrarConsulta(medico, paciente, dataConsulta);
+
         var medicoLivre = buscarMedico();
 
         assertThat(medicoLivre).isNull();
@@ -56,7 +55,6 @@ class MedicoRepositoryTest {
     @Test
     @DisplayName("Devolve Medico quando houver médico disponivel")
     void deveRetornarMedicoQuandoExistirDisponibilidade() {
-        var medico = cadastrarMedicoPadrao();
         var medicoLivre = buscarMedico();
 
         assertThat(medicoLivre).isEqualTo(medico);
@@ -65,7 +63,6 @@ class MedicoRepositoryTest {
     @Test
     @DisplayName("Devolver Null quando médico estiver ocupado")
     void deveRetornarNullQuandoMedicoEstiverOcupado() {
-        var medico = cadastrarMedicoPadrao();
 
         cadastrarConsulta(medico, paciente, dataConsulta);
 
@@ -77,15 +74,10 @@ class MedicoRepositoryTest {
     @Test
     @DisplayName("Deve retornar outro médico disponível quando o primeiro estiver ocupado")
     void deveRetornarOutroMedicoDisponivelQuandoPrimeiroEstiverOcupado() {
-        var medico = cadastrarMedicoPadrao();
+
+        var outroMedico = cadastrarMedico("Outro Medico");
 
         cadastrarConsulta(medico, paciente, dataConsulta);
-
-        var outroMedico = cadastrarMedico(
-                "outro medico",
-                "outro.medico@vollmed.com",
-                "890919",
-                Especialidade.CARDIOLOGIA);
 
         var medicoLivre = buscarMedico();
 
@@ -107,62 +99,71 @@ class MedicoRepositoryTest {
                 );
     }
 
-    private Medico cadastrarMedicoPadrao() {
-        return cadastrarMedico(
-                "medico",
-                "medico@vollmed.com",
-                "687566",
-                Especialidade.CARDIOLOGIA
-        );
-    }
-
     private void cadastrarConsulta(Medico medico, Paciente paciente, LocalDateTime data) {
         em.persist(new Consulta(medico.getId(), paciente.getId(), data));
         em.flush();
     }
 
-    private Medico cadastrarMedico(String nome, String email, String crm, Especialidade especialidade) {
-        var medico = new Medico(dadosMedico(nome, email, crm, especialidade));
+    private Medico cadastrarMedico() {
+        var medico = medicoPadrao();
         em.persist(medico);
         em.flush();
         return medico;
     }
 
-    private Paciente cadastrarPaciente(String nome, String email, String cpf) {
-        var paciente = new Paciente(dadosPaciente(nome, email, cpf));
+    private Medico cadastrarMedico(String nome) {
+        var medico = medicoPadrao(nome);
+        em.persist(medico);
+        em.flush();
+        return medico;
+    }
+
+    private Paciente cadastrarPaciente() {
+        var paciente = pacientePadrao();
         em.persist(paciente);
         em.flush();
         return paciente;
     }
 
-    private DadosCadastroMedico dadosMedico(String nome, String email, String crm, Especialidade especialidade) {
-        return new DadosCadastroMedico(
-                nome,
-                email,
-                "61999999999",
-                crm,
-                especialidade,
-                dadosEndereco()
+    private Paciente pacientePadrao() {
+        return new Paciente(
+                "Paciente",
+                "paciente@gmail.com",
+                "17912345678",
+                "00100200312",
+                enderecoPadrao()
         );
     }
 
-    private DadosCadastroPaciente dadosPaciente(String nome, String email, String cpf) {
-        return new DadosCadastroPaciente(
+    private Medico medicoPadrao(String nome) {
+        return new Medico(
                 nome,
-                email,
-                "61999999999",
-                cpf,
-                dadosEndereco()
+                "outromedico@vollmed.com",
+                "17987654321",
+                "100200",
+                Especialidade.CARDIOLOGIA,
+                enderecoPadrao()
         );
     }
 
-    private DadosEndereco dadosEndereco() {
-        return new DadosEndereco(
-                "rua xpto",
-                "bairro",
-                "00000000",
-                "Brasilia",
-                "DF",
+    private Medico medicoPadrao() {
+        return new Medico(
+                "Medico",
+                "medico@vollmed.com",
+                "17912345678",
+                "001002",
+                Especialidade.CARDIOLOGIA,
+                enderecoPadrao()
+        );
+    }
+
+    private Endereco enderecoPadrao() {
+        return new Endereco(
+                "Rua XPTO",
+                "100",
+                "Casa",
+                "Centro",
+                "Brasília",
                 "DF",
                 "79874015"
         );
