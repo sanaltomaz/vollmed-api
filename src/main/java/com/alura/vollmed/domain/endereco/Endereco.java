@@ -19,7 +19,7 @@ public class Endereco {
     private String uf;
     private String cep;
 
-    // Remover futuramente
+    // Remover após refatoração dos testes
     public Endereco(DadosEndereco dados) {
         this.logradouro = dados.logradouro();
         this.numero = dados.numero();
@@ -30,7 +30,7 @@ public class Endereco {
         this.cep = dados.cep();
     }
 
-    // Remover quando refactor referentes a Medicos
+    // Remover após refatoração dos testes
     public void atualizarInformacoes(DadosEndereco dados) {
         if (dados.logradouro() != null) {
             this.logradouro = dados.logradouro();

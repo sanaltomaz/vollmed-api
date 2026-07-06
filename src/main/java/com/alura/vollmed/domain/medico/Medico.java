@@ -30,7 +30,7 @@ public class Medico {
 
     private boolean ativo;
 
-    // Remover quando refactor de testes referentes a Medico
+    // Remover após refatoração dos testes
     public Medico(DadosCadastroMedico dados) {
         this.ativo = true;
         this.nome = dados.nome();

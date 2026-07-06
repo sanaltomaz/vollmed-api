@@ -1,12 +1,11 @@
 package com.alura.vollmed.controller;
 
 import com.alura.vollmed.domain.endereco.DadosEndereco;
-import com.alura.vollmed.domain.paciente.DadosAtualizacaoPaciente;
-import com.alura.vollmed.domain.paciente.DadosCadastroPaciente;
-import com.alura.vollmed.domain.paciente.Paciente;
-import com.alura.vollmed.domain.paciente.PacienteRepository;
+import com.alura.vollmed.domain.endereco.Endereco;
+import com.alura.vollmed.domain.paciente.*;
 import com.alura.vollmed.domain.usuario.UsuarioRepository;
 import com.alura.vollmed.infra.security.TokenService;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +22,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -39,7 +39,7 @@ class PacienteControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private PacienteRepository repository;
+    private PacienteService service;
 
     // Não remover
     @MockitoBean
@@ -55,17 +55,8 @@ class PacienteControllerTest {
 
         var dados = dadosCadastroPadrao();
 
-        when(repository.save(any(Paciente.class)))
-                .thenAnswer(invocation -> {
-                    Paciente paciente = invocation.getArgument(0);
-
-                    ReflectionTestUtils.setField(
-                            paciente,
-                            "id",
-                            1L);
-
-                    return paciente;
-                });
+        when(service.cadastrar(any(DadosCadastroPaciente.class)))
+                .thenReturn(pacientePadrao());
 
         mvc.perform(post("/pacientes")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -111,7 +102,7 @@ class PacienteControllerTest {
     @DisplayName("Listar deve retornar 200 Ok quando disparado")
     void deveRetornarOkQuandoListar() throws Exception {
 
-        when(repository.findAllByAtivoTrue(any(Pageable.class)))
+        when(service.listar(any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
         mvc.perform(get("/pacientes"))
@@ -121,7 +112,7 @@ class PacienteControllerTest {
     @Test
     @DisplayName("Listar deve retornar JSON paginado")
     void deveRetornarJsonPaginado() throws Exception{
-        when(repository.findAllByAtivoTrue(any(Pageable.class)))
+        when(service.listar(any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
         mvc.perform(get("/pacientes"))
@@ -136,8 +127,8 @@ class PacienteControllerTest {
     @Test
     @DisplayName("Detalhar deve retornar 200 Ok se existir Id")
     void deveRetornarOkQuandoExistirIdPaciente() throws Exception {
-        when(repository.getReferenceById(1L))
-                .thenReturn(pacientePadrao());
+        when(service.detalhar(1L))
+                .thenReturn(new DadosDetalhesPaciente(pacientePadrao()));
 
         mvc.perform(get("/pacientes/1"))
                 .andExpect(status().isOk())
@@ -149,8 +140,8 @@ class PacienteControllerTest {
     @Test
     @DisplayName("Detalhar deve retornar 404 EntityNotFoundException se não existir Id")
     void deveRetornarEntityNotFoundExceptionQuandoNaoExistirIdPacienteParaDetalhar() throws Exception {
-        when(repository.getReferenceById(99L))
-                .thenThrow(jakarta.persistence.EntityNotFoundException.class);
+        when(service.detalhar(99L))
+                .thenThrow(EntityNotFoundException.class);
 
         mvc.perform(get("/pacientes/99"))
                 .andExpect(status().isNotFound());
@@ -160,8 +151,11 @@ class PacienteControllerTest {
     @DisplayName("Atualizar deve retornar 200 Ok quando Dados e Id corretos")
     void deveRetornarOkQuandoAtualizarPaciente() throws Exception {
 
-        when(repository.getReferenceById(1L))
-                .thenReturn(pacientePadrao());
+        when(service.atualizar(
+                any(DadosAtualizacaoPaciente.class),
+                any(Long.class)
+                )).thenReturn(
+                        new DadosDetalhesPaciente(pacienteAtualizado()));
 
         mvc.perform(put("/pacientes/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -189,8 +183,10 @@ class PacienteControllerTest {
     @Test
     @DisplayName("Atualizar deve retornar 404 EntityNotFoundException se Id não existir")
     void deveRetornarEntityNotFoundExceptionQuandoNaoExistirIdPacienteParaAtualizar() throws Exception {
-        when(repository.getReferenceById(99L))
-                .thenThrow(jakarta.persistence.EntityNotFoundException.class);
+        when(service.atualizar(
+                any(DadosAtualizacaoPaciente.class),
+                any(Long.class))
+        ).thenThrow(EntityNotFoundException.class);
 
         mvc.perform(put("/pacientes/99")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -201,8 +197,6 @@ class PacienteControllerTest {
     @Test
     @DisplayName("Deletar deve retornar 204 No Content")
     void deveRetornarNoContentQuandoPacienteForDeletado() throws Exception {
-        when(repository.getReferenceById(1L))
-                .thenReturn(pacientePadrao());
 
         mvc.perform(delete("/pacientes/1"))
                 .andExpect(status().isNoContent());
@@ -211,8 +205,9 @@ class PacienteControllerTest {
     @Test
     @DisplayName("Deletar deve retornar 404 EntityNotFoundException quando Id não existir")
     void deveRetornarEntityNotFoundExceptionQuandoNaoForDeletado() throws Exception {
-        when(repository.getReferenceById(99L))
-                .thenThrow(jakarta.persistence.EntityNotFoundException.class);
+
+        doThrow(new EntityNotFoundException())
+                .when(service).deletar(99L);
 
         mvc.perform(delete("/pacientes/99"))
                 .andExpect(status().isNotFound());
@@ -221,7 +216,7 @@ class PacienteControllerTest {
     @Test
     @DisplayName("Listar Deletados deve retornar 200 Ok")
     void deveRetornarOkQuandoListarDeletados() throws Exception {
-        when(repository.findAllByAtivoFalse(any(Pageable.class)))
+        when(service.listarDeletados(any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
         mvc.perform(get("/pacientes/deletados"))
@@ -253,7 +248,13 @@ class PacienteControllerTest {
     }
 
     private Paciente pacientePadrao() {
-        Paciente paciente = new Paciente(dadosCadastroPadrao());
+        var paciente = new Paciente(
+                "Edson Castro",
+                "edson.castro@email.com",
+                "17993142873",
+                "63202310090",
+                new Endereco(dadosEnderecoPadrao())
+        );
 
         ReflectionTestUtils.setField(paciente, "id", 1L);
 
@@ -266,5 +267,19 @@ class PacienteControllerTest {
                 "17999999999",
                 dadosEnderecoPadrao()
         );
+    }
+
+    private Paciente pacienteAtualizado() {
+        Paciente paciente = new Paciente(
+                "Novo Nome",
+                "edson.castro@email.com",
+                "17999999999",
+                "63202310090",
+                new Endereco(dadosEnderecoPadrao())
+        );
+
+        ReflectionTestUtils.setField(paciente, "id", 1L);
+
+        return paciente;
     }
 }

@@ -27,7 +27,7 @@ public class Paciente {
 
     private boolean ativo;
 
-    // Remover quando refactor de testes referentes a Paciente
+    // Remover após refatoração dos testes
     public Paciente(DadosCadastroPaciente dados) {
         this.ativo = true;
         this.nome = dados.nome();
