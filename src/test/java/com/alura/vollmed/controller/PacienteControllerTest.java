@@ -253,7 +253,7 @@ class PacienteControllerTest {
                 "edson.castro@email.com",
                 "17993142873",
                 "63202310090",
-                new Endereco(dadosEnderecoPadrao())
+                enderecoPadrao()
         );
 
         ReflectionTestUtils.setField(paciente, "id", 1L);
@@ -270,16 +270,27 @@ class PacienteControllerTest {
     }
 
     private Paciente pacienteAtualizado() {
-        Paciente paciente = new Paciente(
+        var paciente = new Paciente(
                 "Novo Nome",
                 "edson.castro@email.com",
                 "17999999999",
                 "63202310090",
-                new Endereco(dadosEnderecoPadrao())
+                enderecoPadrao()
         );
 
         ReflectionTestUtils.setField(paciente, "id", 1L);
 
         return paciente;
+    }
+
+    private Endereco enderecoPadrao() {
+        return new Endereco("Avenida São Paulo",
+                "1057",
+                "Casa",
+                "Centro",
+                "São Paulo",
+                "SP",
+                "71467010"
+        );
     }
 }
