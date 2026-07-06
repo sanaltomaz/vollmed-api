@@ -2,7 +2,6 @@ package com.alura.vollmed.domain.medico;
 
 import com.alura.vollmed.domain.endereco.Endereco;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,6 +30,7 @@ public class Medico {
 
     private boolean ativo;
 
+    // Remover quando refactor de testes referentes a Medico
     public Medico(DadosCadastroMedico dados) {
         this.ativo = true;
         this.nome = dados.nome();
@@ -41,16 +41,32 @@ public class Medico {
         this.endereco = new Endereco(dados.endereco());
     }
 
-    public void atualizarInformacoes(@Valid DadosAtualizacaoMedico dados) {
-        if (dados.nome() != null) {
-            this.nome = dados.nome();
-        }
-        if (dados.telefone() != null) {
-            this.telefone = dados.telefone();
-        }
-        if (dados.endereco() != null) {
-            this.endereco.atualizarInformacoes(dados.endereco());
-        }
+    public Medico(String nome,
+                  String email,
+                  String telefone,
+                  String crm,
+                  Especialidade especialidade,
+                  Endereco endereco
+    ) {
+        this.ativo = true;
+        this.nome = nome;
+        this.email = email;
+        this.telefone = telefone;
+        this.crm = crm;
+        this.especialidade = especialidade;
+        this.endereco = endereco;
+    }
+
+    public void atualizarNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void atualizarTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
+    public void atualizarEndereco(Endereco endereco) {
+        this.endereco = endereco;
     }
 
     public void deletar() {

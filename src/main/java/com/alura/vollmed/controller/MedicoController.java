@@ -16,52 +16,48 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class MedicoController {
 
     @Autowired
-    private MedicoRepository repository;
+    private MedicoService service;
 
     @PostMapping
     @Transactional
-    public ResponseEntity cadastrar(
+    public ResponseEntity<DadosDetalhesMedico> cadastrar(
             @RequestBody @Valid DadosCadastroMedico dados,
             UriComponentsBuilder uriBuilder){
 
-        var medico = new Medico(dados);
-        repository.save(medico);
+        var medico = service.cadastrar(dados);
 
         var uri = uriBuilder.path("/medicos/{id}")
                 .buildAndExpand(medico.getId()).toUri();
 
-
         return ResponseEntity.created(uri)
-                .body(new DadosDetalhesMedico(medico));
+                .body(service.detalhar(medico.getId()));
     }
 
     @GetMapping
     public ResponseEntity<Page<DadosListagemMedico>> listar(
             @PageableDefault(size=5, sort={"nome"}) Pageable paginacao) {
 
-        var page = repository.findAllByAtivoTrue(paginacao)
-                .map(DadosListagemMedico::new);
-
-        return ResponseEntity.ok(page);
+        return ResponseEntity.ok(
+                service.listar(paginacao)
+        );
     }
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity atualizar(
+    public ResponseEntity<DadosDetalhesMedico> atualizar(
             @RequestBody @Valid DadosAtualizacaoMedico dados,
             @PathVariable Long id){
 
-        var medico = repository.getReferenceById(id);
-        medico.atualizarInformacoes(dados);
-
-        return ResponseEntity.ok(new DadosDetalhesMedico(medico));
+        return ResponseEntity.ok(
+                service.atualizar(dados, id)
+        );
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity deletar(@PathVariable Long id){
-        var medico = repository.getReferenceById(id);
-        medico.deletar();
+    public ResponseEntity<Void> deletar(@PathVariable Long id){
+
+        service.deletar(id);
 
         return ResponseEntity.noContent().build();
     }
@@ -69,16 +65,16 @@ public class MedicoController {
     @GetMapping("/deletados")
     public ResponseEntity<Page<DadosListagemMedico>> listarDeletados(
             @PageableDefault(size = 5, sort = {"nome"}) Pageable paginacao) {
-        var page = repository.findAllByAtivoFalse(paginacao)
-                .map(DadosListagemMedico::new);
 
-        return ResponseEntity.ok(page);
+        return ResponseEntity.ok(
+                service.listarDeletados(paginacao)
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity detalhar(@PathVariable Long id){
-        var medico = repository.getReferenceById(id);
-        return ResponseEntity.ok(new DadosDetalhesMedico(medico));
+    public ResponseEntity<DadosDetalhesMedico> detalhar(@PathVariable Long id){
+
+        return ResponseEntity.ok(service.detalhar(id));
     }
 
 }
