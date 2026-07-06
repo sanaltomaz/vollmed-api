@@ -27,6 +27,7 @@ public class Paciente {
 
     private boolean ativo;
 
+    // Remover quando refactor de testes referentes a Paciente
     public Paciente(DadosCadastroPaciente dados) {
         this.ativo = true;
         this.nome = dados.nome();
@@ -36,20 +37,34 @@ public class Paciente {
         this.endereco = new Endereco(dados.endereco());
     }
 
-    public void atualizarInformacoes(DadosAtualizacaoPaciente dados) {
-        if (dados.nome() != null) {
-            this.nome = dados.nome();
-        }
-        if (dados.telefone() != null) {
-            this.telefone = dados.telefone();
-        }
-        if (dados.endereco() != null) {
-            this.endereco.atualizarInformacoes(dados.endereco());
-        }
+    public Paciente(
+            String nome,
+            String email,
+            String telefone,
+            String cpf,
+            Endereco endereco
+    ) {
+        this.ativo = true;
+        this.nome = nome;
+        this.email = email;
+        this.telefone = telefone;
+        this.cpf = cpf;
+        this.endereco = endereco;
+    }
+
+    public void atualizarNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void atualizarTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
+    public void atualizarEndereco(Endereco endereco) {
+        this.endereco = endereco;
     }
 
     public void deletar() {
         this.ativo = false;
     }
-
 }

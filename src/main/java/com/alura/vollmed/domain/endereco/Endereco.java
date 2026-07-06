@@ -1,11 +1,14 @@
 package com.alura.vollmed.domain.endereco;
 
 import jakarta.persistence.Embeddable;
-import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Embeddable
+@NoArgsConstructor
+@AllArgsConstructor
 public class Endereco {
 
     private String logradouro;
@@ -16,8 +19,7 @@ public class Endereco {
     private String uf;
     private String cep;
 
-    public Endereco() {}
-
+    // Remover futuramente
     public Endereco(DadosEndereco dados) {
         this.logradouro = dados.logradouro();
         this.numero = dados.numero();
@@ -28,6 +30,7 @@ public class Endereco {
         this.cep = dados.cep();
     }
 
+    // Remover quando refactor referentes a Medicos
     public void atualizarInformacoes(DadosEndereco dados) {
         if (dados.logradouro() != null) {
             this.logradouro = dados.logradouro();
