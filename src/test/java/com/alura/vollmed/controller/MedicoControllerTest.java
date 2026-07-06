@@ -1,9 +1,11 @@
 package com.alura.vollmed.controller;
 
 import com.alura.vollmed.domain.endereco.DadosEndereco;
+import com.alura.vollmed.domain.endereco.Endereco;
 import com.alura.vollmed.domain.medico.*;
 import com.alura.vollmed.domain.usuario.UsuarioRepository;
 import com.alura.vollmed.infra.security.TokenService;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -36,7 +39,7 @@ class MedicoControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private MedicoRepository repository;
+    private MedicoService service;
 
     // Não remover
     @MockitoBean
@@ -52,17 +55,8 @@ class MedicoControllerTest {
 
         var dados = dadosCadastroPadrao();
 
-        when(repository.save(any(Medico.class)))
-                .thenAnswer(invocation -> {
-                    Medico medico = invocation.getArgument(0);
-
-                    ReflectionTestUtils.setField(
-                            medico,
-                            "id",
-                            1L);
-
-                    return medico;
-                });
+        when(service.cadastrar(any(DadosCadastroMedico.class)))
+                .thenReturn(medicoPadrao());
 
         mvc.perform(post("/medicos")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -109,7 +103,7 @@ class MedicoControllerTest {
     @DisplayName("Listar deve retornar 200 Ok quando disparado")
     void deveRetornarOkQuandoListar() throws Exception {
 
-        when(repository.findAllByAtivoTrue(any(Pageable.class)))
+        when(service.listar(any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
         mvc.perform(get("/medicos"))
@@ -119,7 +113,7 @@ class MedicoControllerTest {
     @Test
     @DisplayName("Listar deve retornar JSON paginado")
     void deveRetornarJsonPaginado() throws Exception{
-        when(repository.findAllByAtivoTrue(any(Pageable.class)))
+        when(service.listar(any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
         mvc.perform(get("/medicos"))
@@ -134,20 +128,20 @@ class MedicoControllerTest {
     @Test
     @DisplayName("Detalhar deve retornar 200 Ok se existir Id")
     void deveRetornarOkQuandoExistirIdMedico() throws Exception {
-        when(repository.getReferenceById(1L))
-                .thenReturn(medicoPadrao());
+        when(service.detalhar(1L))
+                .thenReturn(new DadosDetalhesMedico(medicoPadrao()));
 
         mvc.perform(get("/medicos/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.nome").value("Edson Castro"))
-                .andExpect(jsonPath("$.email").value("edson.castro@email.com"));
+                .andExpect(jsonPath("$.nome").value("Medico"))
+                .andExpect(jsonPath("$.email").value("medico@vollmed.com"));
     }
 
     @Test
     @DisplayName("Detalhar deve retornar 404 EntityNotFoundException se não existir Id")
     void deveRetornarEntityNotFoundExceptionQuandoNaoExistirIdMedicoParaDetalhar() throws Exception {
-        when(repository.getReferenceById(99L))
+        when(service.detalhar(99L))
                 .thenThrow(jakarta.persistence.EntityNotFoundException.class);
 
         mvc.perform(get("/medicos/99"))
@@ -158,8 +152,10 @@ class MedicoControllerTest {
     @DisplayName("Atualizar deve retornar 200 Ok quando Dados e Id corretos")
     void deveRetornarOkQuandoAtualizarMedico() throws Exception {
 
-        when(repository.getReferenceById(1L))
-                .thenReturn(medicoPadrao());
+        when(service.atualizar(
+                dadosAtualizacaoPadrao(),
+                1L
+            )).thenReturn(new DadosDetalhesMedico(medicoAtualizado()));
 
         mvc.perform(put("/medicos/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -187,8 +183,10 @@ class MedicoControllerTest {
     @Test
     @DisplayName("Atualizar deve retornar 404 EntityNotFoundException se Id não existir")
     void deveRetornarEntityNotFoundExceptionQuandoNaoExistirIdMedicoParaAtualizar() throws Exception {
-        when(repository.getReferenceById(99L))
-                .thenThrow(jakarta.persistence.EntityNotFoundException.class);
+        when(service.atualizar(
+                any(DadosAtualizacaoMedico.class),
+                any(Long.class))
+                ).thenThrow(EntityNotFoundException.class);
 
         mvc.perform(put("/medicos/99")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -199,8 +197,6 @@ class MedicoControllerTest {
     @Test
     @DisplayName("Deletar deve retornar 204 No Content")
     void deveRetornarNoContentQuandoMedicoForDeletado() throws Exception {
-        when(repository.getReferenceById(1L))
-                .thenReturn(medicoPadrao());
 
         mvc.perform(delete("/medicos/1"))
                 .andExpect(status().isNoContent());
@@ -209,8 +205,9 @@ class MedicoControllerTest {
     @Test
     @DisplayName("Deletar deve retornar 404 EntityNotFoundException quando Id não existir")
     void deveRetornarEntityNotFoundExceptionQuandoNaoForDeletado() throws Exception {
-        when(repository.getReferenceById(99L))
-                .thenThrow(jakarta.persistence.EntityNotFoundException.class);
+
+        doThrow(new EntityNotFoundException())
+                .when(service).deletar(99L);
 
         mvc.perform(delete("/medicos/99"))
                 .andExpect(status().isNotFound());
@@ -219,7 +216,7 @@ class MedicoControllerTest {
     @Test
     @DisplayName("Listar Deletados deve retornar 200 Ok")
     void deveRetornarOkQuandoListarDeletados() throws Exception {
-        when(repository.findAllByAtivoFalse(any(Pageable.class)))
+        when(service.listarDeletados(any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
         mvc.perform(get("/medicos/deletados"))
@@ -239,20 +236,15 @@ class MedicoControllerTest {
                 dadosEnderecoPadrao());
     }
 
-    private DadosEndereco dadosEnderecoPadrao() {
-        return new DadosEndereco(
-                "Avenida São Paulo",
-                "1057",
-                "Casa",
-                "Centro",
-                "São Paulo",
-                "SP",
-                "71467010"
-        );
-    }
-
     private Medico medicoPadrao() {
-        var medico = new Medico(dadosCadastroPadrao());
+        var medico = new Medico(
+                "Medico",
+                "medico@vollmed.com",
+                "17981445566",
+                "101002",
+                Especialidade.CARDIOLOGIA,
+                enderecoPadrao()
+        );
 
         ReflectionTestUtils.setField(medico, "id", 1L);
 
@@ -264,6 +256,45 @@ class MedicoControllerTest {
                 "Novo Nome",
                 "17999999999",
                 dadosEnderecoPadrao()
+        );
+    }
+
+    private Medico medicoAtualizado() {
+        var medico = new Medico(
+                "Novo Nome",
+                "medico.atualizado@vollmed.com",
+                "17981445566",
+                "101002",
+                Especialidade.CARDIOLOGIA,
+                enderecoPadrao()
+        );
+
+        ReflectionTestUtils.setField(medico, "id", 1L);
+
+        return medico;
+    }
+
+    private Endereco enderecoPadrao() {
+        return new Endereco(
+                "Avenida São Paulo",
+                "1057",
+                "Casa",
+                "Centro",
+                "São Paulo",
+                "SP",
+                "71467010"
+        );
+    }
+
+    private DadosEndereco dadosEnderecoPadrao() {
+        return new DadosEndereco(
+                "Avenida São Paulo",
+                "1057",
+                "Casa",
+                "Centro",
+                "São Paulo",
+                "SP",
+                "71467010"
         );
     }
 }
