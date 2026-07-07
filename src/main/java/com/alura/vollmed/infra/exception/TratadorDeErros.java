@@ -3,6 +3,7 @@ package com.alura.vollmed.infra.exception;
 import com.alura.vollmed.domain.consulta.ValidacaoConsultaException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -33,6 +34,15 @@ public class TratadorDeErros {
                 .toList();
 
         return ResponseEntity.badRequest().body(erros);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<String> tratarJsonInvalido(
+            HttpMessageNotReadableException ex) {
+
+        return ResponseEntity
+                .badRequest()
+                .body("JSON inválido no corpo da requisição.");
     }
 
     @ExceptionHandler(Exception.class)
