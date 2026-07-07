@@ -52,7 +52,7 @@ public class ConsultaController {
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity cancelarConsulta(
+    public ResponseEntity<Void> cancelarConsulta(
             @RequestBody @Valid DadosCancelamentoConsulta dados,
             @PathVariable Long id) {
 

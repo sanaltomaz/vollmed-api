@@ -41,12 +41,6 @@ public class Consulta {
         this.data = data;
     }
 
-    public Consulta(DadosAgendamentoConsulta dados) {
-        this.idMedico = dados.idMedico();
-        this.idPaciente = dados.idPaciente();
-        this.data = dados.data();
-    }
-
     public void cancelar(MotivoCancelamento motivo, String comentario) {
         this.status = false;
         this.motivoCancelamento = motivo;

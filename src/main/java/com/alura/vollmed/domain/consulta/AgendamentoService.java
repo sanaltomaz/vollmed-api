@@ -27,10 +27,10 @@ public class AgendamentoService {
 
     public DadosDetalhesConsulta agendar(@Valid DadosAgendamentoConsulta dados) {
 
+        validadores.forEach(v -> v.validar(dados));
+
         var paciente = pacienteRepository.getReferenceById(dados.idPaciente());
         var medico = escolherMedico(dados);
-
-        validadores.forEach(v -> v.validar(dados));
 
         if (medico == null) {
             throw new ValidacaoConsultaException("Sem médico disponível no momento.");
@@ -44,10 +44,11 @@ public class AgendamentoService {
 
         consultaRepository.save(consulta);
 
-        var nomeMedico = medico.getNome();
-        var nomePaciente = paciente.getNome();
-
-        return new DadosDetalhesConsulta(consulta, nomeMedico, nomePaciente);
+        return new DadosDetalhesConsulta(
+                consulta,
+                medico.getNome(),
+                paciente.getNome()
+        );
     }
 
     private Medico escolherMedico(@Valid DadosAgendamentoConsulta dados) {
