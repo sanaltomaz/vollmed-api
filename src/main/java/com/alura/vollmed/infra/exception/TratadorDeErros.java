@@ -8,40 +8,48 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.List;
+
 @RestControllerAdvice
 public class TratadorDeErros {
 
     @ExceptionHandler(ValidacaoConsultaException.class)
-    public ResponseEntity<String> tratarErrosValidacaoAgendamento(ValidacaoConsultaException ex){
+    public ResponseEntity<String> tratarValidacaoConsulta(ValidacaoConsultaException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<Void> tratarEntidadeNaoEncontrada() {
+        return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<List<DadosErroValidacao>> tratarBeanValidation(
+            MethodArgumentNotValidException ex) {
+
+        var erros = ex.getFieldErrors()
+                .stream()
+                .map(DadosErroValidacao::new)
+                .toList();
+
+        return ResponseEntity.badRequest().body(erros);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> tratarErroGenerico(Exception ex) {
         ex.printStackTrace();
 
-        return ResponseEntity.badRequest().body(ex.getClass().getName());
-    }
-
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Void> tratrarErro404() {
-        return ResponseEntity.notFound().build();
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity tratarErro400(
-            MethodArgumentNotValidException ex
-    ) {
-        var erros = ex.getFieldErrors();
-        return ResponseEntity.badRequest().body(
-                erros.stream().map(DadosErroValidacao::new).toList()
-        );
+        return ResponseEntity
+                .internalServerError()
+                .body("Ocorreu um erro interno inesperado.");
     }
 
     private record DadosErroValidacao(String campo, String descricao) {
-        public DadosErroValidacao(FieldError erro){
+
+        public DadosErroValidacao(FieldError erro) {
             this(
-                    erro.getField(), erro.getDefaultMessage()
+                    erro.getField(),
+                    erro.getDefaultMessage()
             );
         }
     }
