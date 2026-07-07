@@ -24,7 +24,7 @@ public class PacienteController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity cadastrar(
+    public ResponseEntity<DadosDetalhesPaciente> cadastrar(
             @RequestBody @Valid DadosCadastroPaciente dados,
             UriComponentsBuilder uriBuilder) {
 
@@ -46,7 +46,7 @@ public class PacienteController {
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity atualizar(
+    public ResponseEntity<DadosDetalhesPaciente> atualizar(
             @RequestBody @Valid DadosAtualizacaoPaciente dados,
             @PathVariable Long id) {
 
@@ -55,7 +55,7 @@ public class PacienteController {
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity deletar(@PathVariable Long id) {
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
 
         service.deletar(id);
 
@@ -70,7 +70,7 @@ public class PacienteController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity detalhar(@PathVariable Long id) {
+    public ResponseEntity<DadosDetalhesPaciente> detalhar(@PathVariable Long id) {
 
         return ResponseEntity.ok(service.detalhar(id));
     }
