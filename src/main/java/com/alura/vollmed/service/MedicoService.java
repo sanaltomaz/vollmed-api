@@ -1,7 +1,8 @@
-package com.alura.vollmed.domain.medico;
+package com.alura.vollmed.service;
 
 import com.alura.vollmed.domain.endereco.DadosEndereco;
 import com.alura.vollmed.domain.endereco.Endereco;
+import com.alura.vollmed.domain.medico.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

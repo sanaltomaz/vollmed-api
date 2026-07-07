@@ -1,6 +1,10 @@
 package com.alura.vollmed.controller;
 
-import com.alura.vollmed.domain.paciente.*;
+import com.alura.vollmed.domain.paciente.DadosAtualizacaoPaciente;
+import com.alura.vollmed.domain.paciente.DadosCadastroPaciente;
+import com.alura.vollmed.domain.paciente.DadosDetalhesPaciente;
+import com.alura.vollmed.domain.paciente.DadosListagemPaciente;
+import com.alura.vollmed.service.PacienteService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

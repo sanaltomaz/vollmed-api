@@ -1,5 +1,6 @@
-package com.alura.vollmed.domain.consulta;
+package com.alura.vollmed.service;
 
+import com.alura.vollmed.domain.consulta.*;
 import com.alura.vollmed.domain.consulta.validador.agendamento.ValidadorAgendamento;
 import com.alura.vollmed.domain.medico.Medico;
 import com.alura.vollmed.domain.medico.MedicoRepository;

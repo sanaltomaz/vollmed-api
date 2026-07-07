@@ -1,6 +1,8 @@
 package com.alura.vollmed.controller;
 
 import com.alura.vollmed.domain.consulta.*;
+import com.alura.vollmed.service.AgendamentoService;
+import com.alura.vollmed.service.CancelamentoService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

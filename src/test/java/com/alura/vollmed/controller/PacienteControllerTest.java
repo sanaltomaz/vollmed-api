@@ -2,9 +2,13 @@ package com.alura.vollmed.controller;
 
 import com.alura.vollmed.domain.endereco.DadosEndereco;
 import com.alura.vollmed.domain.endereco.Endereco;
-import com.alura.vollmed.domain.paciente.*;
+import com.alura.vollmed.domain.paciente.DadosAtualizacaoPaciente;
+import com.alura.vollmed.domain.paciente.DadosCadastroPaciente;
+import com.alura.vollmed.domain.paciente.DadosDetalhesPaciente;
+import com.alura.vollmed.domain.paciente.Paciente;
 import com.alura.vollmed.domain.usuario.UsuarioRepository;
 import com.alura.vollmed.infra.security.TokenService;
+import com.alura.vollmed.service.PacienteService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -5,6 +5,7 @@ import com.alura.vollmed.domain.endereco.Endereco;
 import com.alura.vollmed.domain.medico.*;
 import com.alura.vollmed.domain.usuario.UsuarioRepository;
 import com.alura.vollmed.infra.security.TokenService;
+import com.alura.vollmed.service.MedicoService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

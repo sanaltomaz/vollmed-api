@@ -4,6 +4,8 @@ import com.alura.vollmed.domain.consulta.*;
 import com.alura.vollmed.domain.medico.Especialidade;
 import com.alura.vollmed.domain.usuario.UsuarioRepository;
 import com.alura.vollmed.infra.security.TokenService;
+import com.alura.vollmed.service.AgendamentoService;
+import com.alura.vollmed.service.CancelamentoService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

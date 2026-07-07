@@ -1,5 +1,6 @@
-package com.alura.vollmed.domain.usuario;
+package com.alura.vollmed.service;
 
+import com.alura.vollmed.domain.usuario.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

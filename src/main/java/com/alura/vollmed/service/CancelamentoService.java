@@ -1,5 +1,7 @@
-package com.alura.vollmed.domain.consulta;
+package com.alura.vollmed.service;
 
+import com.alura.vollmed.domain.consulta.ConsultaRepository;
+import com.alura.vollmed.domain.consulta.DadosCancelamentoConsulta;
 import com.alura.vollmed.domain.consulta.validador.cancelamento.ValidadorCancelamento;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

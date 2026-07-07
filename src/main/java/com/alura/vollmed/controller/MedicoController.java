@@ -1,6 +1,10 @@
 package com.alura.vollmed.controller;
 
-import com.alura.vollmed.domain.medico.*;
+import com.alura.vollmed.domain.medico.DadosAtualizacaoMedico;
+import com.alura.vollmed.domain.medico.DadosCadastroMedico;
+import com.alura.vollmed.domain.medico.DadosDetalhesMedico;
+import com.alura.vollmed.domain.medico.DadosListagemMedico;
+import com.alura.vollmed.service.MedicoService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
